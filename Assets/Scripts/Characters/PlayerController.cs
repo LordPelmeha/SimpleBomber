@@ -6,12 +6,18 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 5f;
 
+    [Header("Bombs")]
+    public GameObject bombPrefab;
+    public float bombFuseTime = 2f;
+    public int bombRange = 4;
+
     private GridManager grid;
     private int gridX;
     private int gridY;
     private bool isMoving;
     private Vector3 targetWorldPos;
 
+    private Keyboard kb = Keyboard.current;
     private void Start()
     {
         grid = GridManager.Instance;
@@ -33,7 +39,6 @@ public class PlayerController : MonoBehaviour
             if (spawnFound) break;
         }
 
-
         if (!spawnFound)
         {
             gridX = 1;
@@ -47,14 +52,13 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleMovementInput();
+        HandleBombInput();
         MoveToTarget();
     }
 
     private void HandleMovementInput()
     {
         if (isMoving) return;
-
-        Keyboard kb = Keyboard.current;
 
         int dx = 0;
         int dy = 0;
@@ -97,6 +101,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HandleBombInput()
+    {
+
+        if (kb.spaceKey.wasPressedThisFrame)
+        {
+            PlaceBomb();
+        }
+    }
+
     private void MoveToTarget()
     {
         if (!isMoving) return;
@@ -111,6 +124,19 @@ public class PlayerController : MonoBehaviour
         {
             transform.position = targetWorldPos;
             isMoving = false;
+        }
+    }
+
+    private void PlaceBomb()
+    {
+        if (bombPrefab == null) return;
+
+        Vector3 bombPos = grid.GridToWorld(gridX, gridY);
+        GameObject bombGo = Instantiate(bombPrefab, bombPos, Quaternion.identity);
+        Bomb bomb = bombGo.GetComponent<Bomb>();
+        if (bomb != null)
+        {
+            bomb.Init(gridX, gridY, bombRange, bombFuseTime);
         }
     }
 

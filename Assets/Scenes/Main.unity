@@ -450,6 +450,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 5
+  bombPrefab: {fileID: 7512451441253696777, guid: f727a12e07bca5c4e9bb59effd727549, type: 3}
+  bombFuseTime: 2
+  bombRange: 1
+--- !u!114 &1069847278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069847271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87550dd35e7f792449881850b9e31f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
 --- !u!1 &1477241726
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,6 +589,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3705901525619876796, guid: e19a5a9d9bd37d94a8375b3386aa8279, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1069847277}
+    - targetCorrespondingSourceObject: {fileID: 3705901525619876796, guid: e19a5a9d9bd37d94a8375b3386aa8279, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1069847278}
   m_SourcePrefab: {fileID: 100100000, guid: e19a5a9d9bd37d94a8375b3386aa8279, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
