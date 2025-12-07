@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
+    private float worldSpeed;
 
     [Header("Bombs")]
     public GameObject bombPrefab;
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
             for (int y = 0; y < grid.height; y++)
             {
                 Cell cell = grid.Cells[x, y];
-                if (cell != null && cell.type == CellType.PlayerSpawn)
+                if (cell.type == CellType.PlayerSpawn)
                 {
                     gridX = x;
                     gridY = y;
@@ -48,11 +49,16 @@ public class PlayerController : MonoBehaviour
 
         transform.position = grid.GridToWorld(gridX, gridY);
         targetWorldPos = transform.position;
+
+        moveSpeed = GameSettings.PlayerCellsPerSecond;
+        bombRange = GameSettings.BombRange;
+
+        worldSpeed = moveSpeed * grid.cellSize;
     }
 
     private void Update()
     {
-        if ((gm.IsGameOver || gm.IsPaused) && gm != null)
+        if (gm.IsGameOver || gm.IsPaused)
             return;
 
         HandleMovementInput();
@@ -67,19 +73,19 @@ public class PlayerController : MonoBehaviour
         int dx = 0;
         int dy = 0;
 
-        if (kb.wKey.wasPressedThisFrame)
+        if (kb.wKey.isPressed)
         {
             dy = 1;
         }
-        else if (kb.sKey.wasPressedThisFrame)
+        else if (kb.sKey.isPressed)
         {
             dy = -1;
         }
-        else if (kb.aKey.wasPressedThisFrame)
+        else if (kb.aKey.isPressed)
         {
             dx = -1;
         }
-        else if (kb.dKey.wasPressedThisFrame)
+        else if (kb.dKey.isPressed)
         {
             dx = 1;
         }
@@ -124,7 +130,7 @@ public class PlayerController : MonoBehaviour
         transform.position = Vector3.MoveTowards(
             transform.position,
             targetWorldPos,
-            moveSpeed * Time.deltaTime
+            worldSpeed * Time.deltaTime
         );
 
         if (Vector3.Distance(transform.position, targetWorldPos) < 0.01f)
@@ -136,8 +142,6 @@ public class PlayerController : MonoBehaviour
 
     private void PlaceBomb()
     {
-        if (bombPrefab == null) return;
-
         Vector3 bombPos = grid.GridToWorld(gridX, gridY);
         GameObject bombGo = Instantiate(bombPrefab, bombPos, Quaternion.identity);
         Bomb bomb = bombGo.GetComponent<Bomb>();

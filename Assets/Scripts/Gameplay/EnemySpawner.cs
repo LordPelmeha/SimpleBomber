@@ -15,6 +15,7 @@ public class EnemySpawner : MonoBehaviour
     {
         grid = GridManager.Instance;
 
+        spawnInterval = GameSettings.EnemySpawnInterval;
         for (int x = 0; x < grid.width; x++)
         {
             for (int y = 0; y < grid.height; y++)

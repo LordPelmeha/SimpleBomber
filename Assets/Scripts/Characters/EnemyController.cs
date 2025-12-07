@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    private float worldSpeed;
 
     private GridManager grid;
     private PlayerController player;
@@ -29,7 +30,11 @@ public class EnemyController : MonoBehaviour
     private void Start()
     {
         grid = GridManager.Instance;
-        player = FindObjectOfType<PlayerController>();
+        player = FindFirstObjectByType<PlayerController>();
+
+        moveSpeed = GameSettings.EnemyCellsPerSecond;
+
+        worldSpeed = moveSpeed * grid.cellSize;
 
         RecalculatePath();
     }
@@ -102,7 +107,8 @@ public class EnemyController : MonoBehaviour
         transform.position = Vector3.MoveTowards(
             transform.position,
             targetWorldPos,
-            moveSpeed * Time.deltaTime);
+            worldSpeed * Time.deltaTime
+        );
 
         if (Vector3.Distance(transform.position, targetWorldPos) < 0.01f)
         {
