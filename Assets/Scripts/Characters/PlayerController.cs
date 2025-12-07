@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
             for (int y = 0; y < grid.height; y++)
             {
                 Cell cell = grid.Cells[x, y];
-                if (cell.type == CellType.PlayerSpawn)
+                if (cell != null && cell.type == CellType.PlayerSpawn)
                 {
                     gridX = x;
                     gridY = y;
