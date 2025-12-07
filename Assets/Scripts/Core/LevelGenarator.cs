@@ -12,6 +12,7 @@ public class LevelGenerator : MonoBehaviour
 
     private GridManager grid;
 
+
     private void Start()
     {
         grid = GridManager.Instance;
@@ -80,5 +81,15 @@ public class LevelGenerator : MonoBehaviour
             grid.GridToWorld(exitX, exitY),
             Quaternion.identity,
             transform);
+
+        int enemySpawnY = grid.height - 2;
+        for (int x = 1; x < grid.width - 1; x++)
+        {
+            Cell cell = grid.Cells[x, enemySpawnY];
+            if (cell != null && cell.IsWalkable)
+            {
+                cell.type = CellType.EnemySpawn;
+            }
+        }
     }
 }

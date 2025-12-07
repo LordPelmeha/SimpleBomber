@@ -8,7 +8,7 @@ public class Bomb : MonoBehaviour
     private int range;
     private float fuseTime;
 
-    [SerializeField] GameObject explosionPrefab;
+    public GameObject explosionPrefab;
 
     private GridManager grid;
 
@@ -36,9 +36,9 @@ public class Bomb : MonoBehaviour
     {
         CreateExplosion(gridX, gridY);
 
-        ExplodeDirection(1, 0);
+        ExplodeDirection(1, 0); 
         ExplodeDirection(-1, 0);
-        ExplodeDirection(0, 1);
+        ExplodeDirection(0, 1); 
         ExplodeDirection(0, -1);
 
         Destroy(gameObject);
@@ -59,19 +59,24 @@ public class Bomb : MonoBehaviour
 
             Cell cell = grid.GetCell(x, y);
 
-            if (cell.type == CellType.SolidWall ||
-                cell.type == CellType.DestructibleWall)
-            {
+            if (cell.type == CellType.SolidWall)
                 break;
-            }
 
             CreateExplosion(x, y);
+
+            if (cell.type == CellType.DestructibleWall)
+                break;
         }
     }
 
     private void CreateExplosion(int x, int y)
     {
         Vector3 pos = grid.GridToWorld(x, y);
-        Instantiate(explosionPrefab, pos, Quaternion.identity);
+        GameObject go = Instantiate(explosionPrefab, pos, Quaternion.identity);
+        Explosion exp = go.GetComponent<Explosion>();
+        if (exp != null)
+        {
+            exp.Init(x, y);
+        }
     }
 }

@@ -97,7 +97,10 @@ public class PlayerController : MonoBehaviour
         Vector3 dir = new Vector3(dx, 0f, dy);
         if (dir != Vector3.zero)
         {
+            transform.Rotate(0, 0, 0);
+            transform.Rotate(90 * dx,0,90*dy);
             transform.forward = dir;
+            
         }
     }
 
@@ -144,4 +147,5 @@ public class PlayerController : MonoBehaviour
     {
         return (gridX, gridY);
     }
+
 }
