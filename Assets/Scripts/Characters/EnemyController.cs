@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour
     private List<Cell> path;
     private int pathIndex;
 
+    private GameManager gm = GameManager.Instance;
     public void Init(int startX, int startY)
     {
         gridX = startX;
@@ -35,7 +36,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+        if ((gm.IsGameOver || gm.IsPaused) && gm != null)
             return;
 
         if (player == null) return;

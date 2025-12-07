@@ -18,10 +18,11 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetWorldPos;
 
     private Keyboard kb = Keyboard.current;
+    private GameManager gm;
     private void Start()
     {
         grid = GridManager.Instance;
-
+        gm = GameManager.Instance;
         bool spawnFound = false;
         for (int x = 0; x < grid.width; x++)
         {
@@ -51,6 +52,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if ((gm.IsGameOver || gm.IsPaused) && gm != null)
+            return;
+
         HandleMovementInput();
         HandleBombInput();
         MoveToTarget();
@@ -98,9 +102,9 @@ public class PlayerController : MonoBehaviour
         if (dir != Vector3.zero)
         {
             transform.Rotate(0, 0, 0);
-            transform.Rotate(90 * dx,0,90*dy);
+            transform.Rotate(90 * dx, 0, 90 * dy);
             transform.forward = dir;
-            
+
         }
     }
 

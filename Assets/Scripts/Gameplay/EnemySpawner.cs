@@ -10,6 +10,7 @@ public class EnemySpawner : MonoBehaviour
     private GridManager grid;
     private List<Cell> spawnCells = new List<Cell>();
 
+    private GameManager gm = GameManager.Instance;
     private void Start()
     {
         grid = GridManager.Instance;
@@ -40,8 +41,14 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+            if (gm != null && gm.IsGameOver)
                 yield break;
+
+            if (gm != null && gm.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
 
             SpawnEnemy();
             yield return new WaitForSeconds(spawnInterval);

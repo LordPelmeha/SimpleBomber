@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public bool IsGameOver { get; private set; } = false;
+    public bool IsPaused { get; private set; } = false;
 
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (IsGameOver) return;
+        if (IsGameOver || IsPaused) return;
 
         elapsedTime += Time.deltaTime;
         if (hud != null)
@@ -75,6 +76,56 @@ public class GameManager : MonoBehaviour
         {
             hud.SetEnemiesKilled(enemiesKilled);
         }
+    }
+
+    public void PauseGame()
+    {
+        if (IsGameOver || IsPaused) return;
+
+        IsPaused = true;
+        Time.timeScale = 0f;
+        Debug.Log("Game Paused");
+    }
+
+    public void ResumeGame()
+    {
+        if (!IsPaused) return;
+
+        IsPaused = false;
+        Time.timeScale = 1f;
+        Debug.Log("Game Resumed");
+    }
+
+    public void RestartLevel()
+    {
+        Time.timeScale = 1f;
+        IsGameOver = false;
+        IsPaused = false;
+
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.buildIndex);
+    }
+
+    public void LoadMainMenu()
+    {
+        Time.timeScale = 1f;
+        IsGameOver = false;
+        IsPaused = false;
+
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void QuitGame()
+    {
+        Time.timeScale = 1f;
+
+        Debug.Log("QuitGame called");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private IEnumerator ReloadSceneCoroutine()
