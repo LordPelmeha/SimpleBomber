@@ -20,6 +20,12 @@ public class GridManager : MonoBehaviour
 
         Instance = this;
 
+        int size = GameSettings.GridSize;
+        if (size > 0)
+        {
+            width = size;
+            height = size;
+        }
         Cells = new Cell[width, height];
     }
 

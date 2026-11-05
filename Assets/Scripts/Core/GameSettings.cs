@@ -6,4 +6,6 @@
     public static int BombRange = 3;
 
     public static float EnemySpawnInterval = 5f;
+
+    public static int GridSize = 15;
 }
