@@ -10,8 +10,13 @@ public class LevelGenerator : MonoBehaviour
     [Range(0f, 1f)]
     public float destructibleChance = 0.3f;
 
-    private GridManager grid;
+    [Tooltip("Минимальное расстояние (в клетках) от игрока до точки спавна врага")]
+    public int minSpawnDistanceFromPlayer = 3;
 
+    [Tooltip("Радиус (в клетках) вокруг выхода, где враги не спавнятся")]
+    public int exitSafeRadius = 2;
+
+    private GridManager grid;
 
     private void Start()
     {
@@ -21,6 +26,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void Generate()
     {
+        // === 1. Генерация пола и стен ===
         for (int x = 0; x < grid.width; x++)
         {
             for (int y = 0; y < grid.height; y++)
@@ -57,7 +63,6 @@ public class LevelGenerator : MonoBehaviour
                 }
 
                 bool playerSafeZone = (x <= 2 && y <= 2);
-
                 bool exitZone = (x >= grid.width - 3 && y >= grid.height - 3);
 
                 if (!playerSafeZone && !exitZone)
@@ -71,6 +76,7 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        // === 2. Игрок и выход ===
         grid.Cells[1, 1].type = CellType.PlayerSpawn;
 
         int exitX = grid.width - 2;
@@ -82,12 +88,32 @@ public class LevelGenerator : MonoBehaviour
             Quaternion.identity,
             transform);
 
-        int enemySpawnY = grid.height - 2;
+
         for (int x = 1; x < grid.width - 1; x++)
         {
-            Cell cell = grid.Cells[x, enemySpawnY];
-            if (cell != null && cell.IsWalkable)
+            for (int y = 1; y < grid.height - 1; y++)
             {
+                Cell cell = grid.Cells[x, y];
+
+                // Только пустые проходимые клетки
+                if (cell == null) continue;
+                if (!cell.IsWalkable) continue;
+                if (cell.type != CellType.Empty) continue;
+
+                // Не спавним слишком близко к игроку
+                int distFromPlayer = Mathf.Max(
+                    Mathf.Abs(x - 1),
+                    Mathf.Abs(y - 1)
+                );
+                if (distFromPlayer < minSpawnDistanceFromPlayer) continue;
+
+                // Не спавним рядом с выходом
+                int distFromExit = Mathf.Max(
+                    Mathf.Abs(x - exitX),
+                    Mathf.Abs(y - exitY)
+                );
+                if (distFromExit < exitSafeRadius) continue;
+
                 cell.type = CellType.EnemySpawn;
             }
         }
