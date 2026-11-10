@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic; // 🆕 Нужно для List
+using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -15,6 +16,13 @@ public class LevelGenerator : MonoBehaviour
 
     [Tooltip("Радиус (в клетках) вокруг выхода, где враги не спавнятся")]
     public int exitSafeRadius = 2;
+
+    // 🆕 Блок для настройки бонусов
+    [Header("Бонусы на карте")]
+    public GameObject speedPowerUpPrefab; // Сюда перетащим префаб
+    public int minPowerUps = 1;
+    public int maxPowerUps = 2;
+    public int minDistanceFromPlayer = 3; // Чтобы бонус не появлялся прямо под ногами
 
     private GridManager grid;
 
@@ -88,26 +96,23 @@ public class LevelGenerator : MonoBehaviour
             Quaternion.identity,
             transform);
 
-
+        // === 3. Точки спавна врагов ===
         for (int x = 1; x < grid.width - 1; x++)
         {
             for (int y = 1; y < grid.height - 1; y++)
             {
                 Cell cell = grid.Cells[x, y];
 
-                // Только пустые проходимые клетки
                 if (cell == null) continue;
                 if (!cell.IsWalkable) continue;
                 if (cell.type != CellType.Empty) continue;
 
-                // Не спавним слишком близко к игроку
                 int distFromPlayer = Mathf.Max(
                     Mathf.Abs(x - 1),
                     Mathf.Abs(y - 1)
                 );
                 if (distFromPlayer < minSpawnDistanceFromPlayer) continue;
 
-                // Не спавним рядом с выходом
                 int distFromExit = Mathf.Max(
                     Mathf.Abs(x - exitX),
                     Mathf.Abs(y - exitY)
@@ -116,6 +121,62 @@ public class LevelGenerator : MonoBehaviour
 
                 cell.type = CellType.EnemySpawn;
             }
+        }
+
+        // === 4. 🆕 Спавн бонусов на карте ===
+        SpawnPowerUps();
+    }
+
+    // 🆕 Новый метод для спавна бонусов
+    // 🆕 Новый метод для спавна бонусов
+    // 🆕 Метод для спавна бонусов
+    private void SpawnPowerUps()
+    {
+        if (speedPowerUpPrefab == null) return;
+
+        // Координаты выхода
+        int exitX = grid.width - 2;
+        int exitY = grid.height - 2;
+
+        // 1. Собираем все пустые клетки (куда можно наступить)
+        List<Cell> emptyCells = new List<Cell>();
+
+        for (int x = 0; x < grid.width; x++)
+        {
+            for (int y = 0; y < grid.height; y++)
+            {
+                Cell cell = grid.Cells[x, y];
+
+                // 🆕 РАЗРЕШАЕМ спавн как на обычном полу, так и на точках врагов
+                if (cell != null && (cell.type == CellType.Empty || cell.type == CellType.EnemySpawn))
+                {
+                    // Проверяем расстояние до игрока
+                    int distToPlayer = Mathf.Max(Mathf.Abs(1 - x), Mathf.Abs(1 - y));
+                    if (distToPlayer < minDistanceFromPlayer) continue;
+
+                    // Проверяем расстояние до выхода
+                    int distToExit = Mathf.Max(Mathf.Abs(exitX - x), Mathf.Abs(exitY - y));
+                    if (distToExit < exitSafeRadius) continue;
+
+                    emptyCells.Add(cell);
+                }
+            }
+        }
+
+        // 2. Определяем, сколько бонусов создадим
+        int powerUpsToSpawn = Random.Range(minPowerUps, maxPowerUps + 1);
+
+        for (int i = 0; i < powerUpsToSpawn; i++)
+        {
+            if (emptyCells.Count == 0) break; // Если места не осталось
+
+            int randomIndex = Random.Range(0, emptyCells.Count);
+            Cell chosenCell = emptyCells[randomIndex];
+
+            Vector3 pos = grid.GridToWorld(chosenCell.x, chosenCell.y);
+            Instantiate(speedPowerUpPrefab, pos, Quaternion.identity, transform);
+
+            emptyCells.RemoveAt(randomIndex);
         }
     }
 }
