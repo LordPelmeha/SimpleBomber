@@ -1,159 +1,124 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    public float moveSpeed = 5f;
-    private float worldSpeed;
-
-    [Header("Bombs")]
+    [Header("Бомбы")]
     public GameObject bombPrefab;
     public float bombFuseTime = 2f;
-    public int bombRange = 4;
+
+    // 🆕 Множитель скорости (изначально 1)
+    private float speedMultiplier = 1f;
+
+    private int x;
+    private int y;
+    private int targetX;
+    private int targetY;
 
     private GridManager grid;
-    private int gridX;
-    private int gridY;
-    private bool isMoving;
-    private Vector3 targetWorldPos;
+    private bool initialized = false;
 
-    private Keyboard kb = Keyboard.current;
-    private GameManager gm;
+    private bool isMoving = false;
+    private float moveProgress = 0f;
+    private Vector3 startPosition;
+    private Vector3 endPosition;
+
     private void Start()
     {
         grid = GridManager.Instance;
-        gm = GameManager.Instance;
-        bool spawnFound = false;
-        for (int x = 0; x < grid.width; x++)
-        {
-            for (int y = 0; y < grid.height; y++)
-            {
-                Cell cell = grid.Cells[x, y];
-                if (cell != null && cell.type == CellType.PlayerSpawn)
-                {
-                    gridX = x;
-                    gridY = y;
-                    spawnFound = true;
-                    break;
-                }
-            }
-            if (spawnFound) break;
-        }
-
-        if (!spawnFound)
-        {
-            gridX = 1;
-            gridY = 1;
-        }
-
-        transform.position = grid.GridToWorld(gridX, gridY);
-        targetWorldPos = transform.position;
-
-        moveSpeed = GameSettings.PlayerCellsPerSecond;
-        bombRange = GameSettings.BombRange;
-
-        worldSpeed = moveSpeed * grid.cellSize;
+        x = 1;
+        y = 1;
+        targetX = x;
+        targetY = y;
+        transform.position = grid.GridToWorld(x, y);
+        initialized = true;
     }
 
     private void Update()
     {
-        if (gm.IsGameOver || gm.IsPaused)
-            return;
+        if (!initialized || grid == null) return;
+        if (GameManager.Instance != null && (GameManager.Instance.IsPaused || GameManager.Instance.IsGameOver)) return;
 
-        HandleMovementInput();
-        HandleBombInput();
-        MoveToTarget();
-    }
-
-    private void HandleMovementInput()
-    {
-        if (isMoving) return;
-
-        int dx = 0;
-        int dy = 0;
-
-        if (kb.wKey.isPressed)
-        {
-            dy = 1;
-        }
-        else if (kb.sKey.isPressed)
-        {
-            dy = -1;
-        }
-        else if (kb.aKey.isPressed)
-        {
-            dx = -1;
-        }
-        else if (kb.dKey.isPressed)
-        {
-            dx = 1;
-        }
-
-        if (dx == 0 && dy == 0)
-            return;
-
-        int newX = gridX + dx;
-        int newY = gridY + dy;
-
-        if (!grid.IsWalkable(newX, newY))
-            return;
-
-        gridX = newX;
-        gridY = newY;
-        targetWorldPos = grid.GridToWorld(gridX, gridY);
-        isMoving = true;
-
-        Vector3 dir = new Vector3(dx, 0f, dy);
-        if (dir != Vector3.zero)
-        {
-            transform.Rotate(0, 0, 0);
-            transform.Rotate(90 * dx, 0, 90 * dy);
-            transform.forward = dir;
-
-        }
-    }
-
-    private void HandleBombInput()
-    {
-
-        if (kb.spaceKey.wasPressedThisFrame)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             PlaceBomb();
         }
+
+        if (isMoving)
+        {
+            // 🆕 Применяем множитель к скорости
+            float currentSpeed = GameSettings.PlayerCellsPerSecond * speedMultiplier;
+            float stepInterval = 1f / Mathf.Max(0.01f, currentSpeed);
+
+            moveProgress += Time.deltaTime / stepInterval;
+
+            if (moveProgress >= 1f)
+            {
+                transform.position = endPosition;
+                x = targetX;
+                y = targetY;
+                isMoving = false;
+                moveProgress = 0f;
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(startPosition, endPosition, moveProgress);
+            }
+        }
+        else
+        {
+            int dx = 0, dy = 0;
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) dy = 1;
+            else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) dy = -1;
+            else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) dx = -1;
+            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) dx = 1;
+
+            if (dx != 0 || dy != 0)
+            {
+                TryStartMove(dx, dy);
+            }
+        }
     }
 
-    private void MoveToTarget()
+    private void TryStartMove(int dx, int dy)
     {
-        if (!isMoving) return;
+        int nx = x + dx;
+        int ny = y + dy;
 
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            targetWorldPos,
-            worldSpeed * Time.deltaTime
-        );
+        if (!grid.IsWalkable(nx, ny)) return;
 
-        if (Vector3.Distance(transform.position, targetWorldPos) < 0.01f)
+        Cell targetCell = grid.GetCell(nx, ny);
+        if (targetCell == null) return;
+
+        if (targetCell.IsOccupiedByEnemy)
         {
-            transform.position = targetWorldPos;
-            isMoving = false;
+            PlayerHealth health = GetComponent<PlayerHealth>();
+            if (health != null) health.Die();
+            return;
         }
+
+        targetX = nx;
+        targetY = ny;
+        startPosition = transform.position;
+        endPosition = grid.GridToWorld(targetX, targetY);
+        moveProgress = 0f;
+        isMoving = true;
+    }
+
+    // 🆕 Метод для увеличения скорости
+    public void AddSpeed(float amount)
+    {
+        speedMultiplier += amount;
+        // Ограничитель, чтобы не бегал слишком быстро (например, максимум x3)
+        speedMultiplier = Mathf.Clamp(speedMultiplier, 1f, 3f);
+        Debug.Log("Скорость увеличена! Текущий множитель: " + speedMultiplier);
     }
 
     private void PlaceBomb()
     {
-        Vector3 bombPos = grid.GridToWorld(gridX, gridY);
-        GameObject bombGo = Instantiate(bombPrefab, bombPos, Quaternion.identity);
+        if (bombPrefab == null) return;
+        Vector3 pos = grid.GridToWorld(x, y);
+        GameObject bombGo = Instantiate(bombPrefab, pos, Quaternion.identity);
         Bomb bomb = bombGo.GetComponent<Bomb>();
-        if (bomb != null)
-        {
-            bomb.Init(gridX, gridY, bombRange, bombFuseTime);
-        }
+        if (bomb != null) bomb.Init(x, y, GameSettings.BombRange, bombFuseTime);
     }
-
-    public (int x, int y) GetGridPosition()
-    {
-        return (gridX, gridY);
-    }
-
 }

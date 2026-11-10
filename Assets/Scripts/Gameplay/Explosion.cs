@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class Explosion : MonoBehaviour
     private int gridX;
     private int gridY;
     private GridManager grid;
+
+    // Список врагов, которым ЭТОТ взрыв уже нанес урон
+    private HashSet<EnemyController> damagedEnemies = new HashSet<EnemyController>();
 
     public void Init(int x, int y)
     {
@@ -17,9 +21,7 @@ public class Explosion : MonoBehaviour
     private void Start()
     {
         grid = GridManager.Instance;
-
-        HandleDestructibleWall(); 
-
+        HandleDestructibleWall();
         Destroy(gameObject, lifeTime);
     }
 
@@ -30,8 +32,7 @@ public class Explosion : MonoBehaviour
         Cell cell = grid.GetCell(gridX, gridY);
         if (cell == null) return;
 
-        if (cell.type != CellType.DestructibleWall)
-            return;
+        if (cell.type != CellType.DestructibleWall) return;
 
         Vector3 worldPos = grid.GridToWorld(gridX, gridY);
         Vector3 center = worldPos + new Vector3(0f, 0.5f, 0f);
@@ -55,17 +56,18 @@ public class Explosion : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             var health = other.GetComponent<PlayerHealth>();
-            if (health != null)
-            {
-                health.Die();
-            }
+            if (health != null) health.Die();
         }
         else if (other.CompareTag("Enemy"))
         {
-            var enemy = other.GetComponent<EnemyController>();
-            if (enemy != null)
+            // Ищем скрипт врага (вдруг коллайдер на дочернем объекте)
+            var enemy = other.GetComponentInParent<EnemyController>();
+
+            // Если нашли и еще не били его ЭТИМ взрывом
+            if (enemy != null && !damagedEnemies.Contains(enemy))
             {
-                enemy.Die();
+                damagedEnemies.Add(enemy); // Запоминаем
+                enemy.Hit();               // Бьем
             }
         }
     }

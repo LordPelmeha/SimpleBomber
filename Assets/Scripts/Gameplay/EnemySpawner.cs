@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    [Header("Префабы врагов")]
+    public GameObject enemyPrefab;       // обычный враг
+    public GameObject tankEnemyPrefab;   // танк (медленный, 2 хита)
 
     [Header("Спавн")]
     [Tooltip("Минимальное расстояние от игрока (в клетках) до точки появления врага")]
     public int minSpawnDistanceFromPlayer = 5;
+
+    [Range(0f, 1f)]
+    [Tooltip("Шанс, что появится танк вместо обычного врага")]
+    public float tankChance = 0.2f;
 
     private GridManager grid;
     private GameManager gm;
@@ -66,26 +72,20 @@ public class EnemySpawner : MonoBehaviour
     {
         if (enemyPrefab == null || spawnCells.Count == 0) return;
 
-   
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player == null) return;
 
         int px = Mathf.RoundToInt(player.transform.position.x / grid.cellSize);
         int py = Mathf.RoundToInt(player.transform.position.z / grid.cellSize);
 
-
         Cell spawnCell = null;
         for (int attempt = 0; attempt < 30; attempt++)
         {
             Cell candidate = spawnCells[Random.Range(0, spawnCells.Count)];
 
-   
             if (occupiedCells.Contains(candidate)) continue;
-
-   
             if (candidate.enemy != null) continue;
 
-            // расстояние по Чебышёву
             int dist = Mathf.Max(
                 Mathf.Abs(px - candidate.x),
                 Mathf.Abs(py - candidate.y)
@@ -97,15 +97,15 @@ public class EnemySpawner : MonoBehaviour
             break;
         }
 
-        if (spawnCell == null)
-        {
-            // все точки заняты или слишком близко 
-            return;
-        }
+        if (spawnCell == null) return;
 
-        //Спавн
+        // Выбор типа врага
+        GameObject prefabToSpawn = enemyPrefab;
+        if (tankEnemyPrefab != null && Random.value < tankChance)
+            prefabToSpawn = tankEnemyPrefab;
+
         Vector3 pos = grid.GridToWorld(spawnCell.x, spawnCell.y);
-        GameObject enemyGo = Instantiate(enemyPrefab, pos, Quaternion.identity);
+        GameObject enemyGo = Instantiate(prefabToSpawn, pos, Quaternion.identity);
 
         EnemyController enemy = enemyGo.GetComponent<EnemyController>();
         if (enemy != null)

@@ -23,6 +23,5 @@ public class Cell
         type == CellType.EnemySpawn ||
         type == CellType.Exit;
 
-
     public bool IsOccupiedByEnemy => enemy != null;
 }

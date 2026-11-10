@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: f1f6c6f180e7d334eb9571163534b43e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - enemyPrefab: {fileID: 6711428702498871942, guid: fd2aecfaa87dc674fae2f11b2591ba13, type: 3}
+  - tankEnemyPrefab: {fileID: 6711428702498871942, guid: f779f8d88f893264aac29dfd26854a66, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

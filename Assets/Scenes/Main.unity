@@ -535,7 +535,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1226,10 +1226,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22b3b8375a8fc34fb9bc7f1373351a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
   bombPrefab: {fileID: 7512451441253696777, guid: f727a12e07bca5c4e9bb59effd727549, type: 3}
   bombFuseTime: 1.5
-  bombRange: 3
 --- !u!114 &1069847278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1686,6 +1684,8 @@ MonoBehaviour:
   destructibleWallPrefab: {fileID: 7124960684459376937, guid: 2f6de9a220bd9354bbac8a6533031d26, type: 3}
   exitPrefab: {fileID: 407791857777295770, guid: 761c7506f05a08f47a82be1e740fc288, type: 3}
   destructibleChance: 0.3
+  minSpawnDistanceFromPlayer: 3
+  exitSafeRadius: 2
 --- !u!114 &1477241728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1729,7 +1729,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 6711428702498871942, guid: fd2aecfaa87dc674fae2f11b2591ba13, type: 3}
-  spawnInterval: 5
+  tankEnemyPrefab: {fileID: 6711428702498871942, guid: f779f8d88f893264aac29dfd26854a66, type: 3}
+  minSpawnDistanceFromPlayer: 5
+  tankChance: 1
 --- !u!114 &1477241731
 MonoBehaviour:
   m_ObjectHideFlags: 0
