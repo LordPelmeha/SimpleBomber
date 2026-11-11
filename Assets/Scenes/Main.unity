@@ -1686,6 +1686,10 @@ MonoBehaviour:
   destructibleChance: 0.3
   minSpawnDistanceFromPlayer: 3
   exitSafeRadius: 2
+  speedPowerUpPrefab: {fileID: 6663810570238375261, guid: 6f78f704599e2cc41b32e47a35b06963, type: 3}
+  minPowerUps: 1
+  maxPowerUps: 1
+  minDistanceFromPlayer: 2
 --- !u!114 &1477241728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1731,7 +1735,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 6711428702498871942, guid: fd2aecfaa87dc674fae2f11b2591ba13, type: 3}
   tankEnemyPrefab: {fileID: 6711428702498871942, guid: f779f8d88f893264aac29dfd26854a66, type: 3}
   minSpawnDistanceFromPlayer: 5
-  tankChance: 1
+  tankChance: 0.5
 --- !u!114 &1477241731
 MonoBehaviour:
   m_ObjectHideFlags: 0
