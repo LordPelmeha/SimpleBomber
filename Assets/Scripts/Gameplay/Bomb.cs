@@ -34,11 +34,13 @@ public class Bomb : MonoBehaviour
 
     private void Explode()
     {
+        AudioManager.Instance?.PlayExplosion();
+
         CreateExplosion(gridX, gridY);
 
-        ExplodeDirection(1, 0); 
+        ExplodeDirection(1, 0);
         ExplodeDirection(-1, 0);
-        ExplodeDirection(0, 1); 
+        ExplodeDirection(0, 1);
         ExplodeDirection(0, -1);
 
         Destroy(gameObject);

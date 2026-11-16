@@ -890,6 +890,69 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451987355}
   m_CullTransparentMesh: 1
+--- !u!1 &706914320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 706914322}
+  - component: {fileID: 706914321}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &706914321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706914320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33ec074b02b30e3439480db0ef2920f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  menuMusic: {fileID: 8300000, guid: 3a5bd7efb842c9e41a1ec9403f7587b8, type: 3}
+  gameMusic: {fileID: 8300000, guid: c375077acdc6ceb448d5be53f182991b, type: 3}
+  gameOverMusic: {fileID: 8300000, guid: 33bcedcedf62ede4193fae496fce327b, type: 3}
+  bombPlace: {fileID: 8300000, guid: 5d9b8c59a1894c64198b1b8cadab86f3, type: 3}
+  explosions:
+  - {fileID: 8300000, guid: d7db5b3353904c348be1094becece52a, type: 3}
+  - {fileID: 8300000, guid: 4d829802331708a4f82ffb596c1eea79, type: 3}
+  enemyHit: {fileID: 8300000, guid: 93fe5023919013c45b6f36dca4deefd7, type: 3}
+  enemyDeath: {fileID: 8300000, guid: 4450003fed542374d85652f11d66b893, type: 3}
+  playerDeath: {fileID: 8300000, guid: 81d7f863280ef8044b73376c26b45a40, type: 3}
+  speedPickup: {fileID: 8300000, guid: e7c6ca969a1ba0d4fa8f91c08d604208, type: 3}
+  shieldPickup: {fileID: 8300000, guid: befe50aa3ab309c4ba72fdaaca2d26ed, type: 3}
+  shieldAbsorb: {fileID: 8300000, guid: 6c2ac5e4c1d57e04c8435da6985d3f5a, type: 3}
+  win: {fileID: 8300000, guid: 8cc19148de6f0af4e85a52223f45ec6b, type: 3}
+  buttonClick: {fileID: 8300000, guid: c30bc6dd8b2e61c4eb1bfaec908c7c09, type: 3}
+  menuSceneName: MainMenu
+  gameSceneName: Main
+--- !u!4 &706914322
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706914320}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &802683068
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,6 +1303,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87550dd35e7f792449881850b9e31f3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  absorbGraceTime: 0.5
+  shieldVisualPrefab: {fileID: 2222948743029145308, guid: a64ae86120b04b241958539eeab6e556, type: 3}
+  shieldLocalOffset: {x: 0, y: 0.5, z: 0}
   isInvincible: 0
 --- !u!4 &1069847283 stripped
 Transform:
@@ -1690,6 +1756,9 @@ MonoBehaviour:
   minPowerUps: 1
   maxPowerUps: 1
   minDistanceFromPlayer: 2
+  shieldPowerUpPrefab: {fileID: 6663810570238375261, guid: 88e480856503b7145b6c45191615afe3, type: 3}
+  minShieldPowerUps: 0
+  maxShieldPowerUps: 1
 --- !u!114 &1477241728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1734,8 +1803,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 6711428702498871942, guid: fd2aecfaa87dc674fae2f11b2591ba13, type: 3}
   tankEnemyPrefab: {fileID: 6711428702498871942, guid: f779f8d88f893264aac29dfd26854a66, type: 3}
+  patrolEnemyPrefab: {fileID: 6711428702498871942, guid: 7962059c9fe6ddc40ada58ba16be82f1, type: 3}
   minSpawnDistanceFromPlayer: 5
   tankChance: 0.5
+  patrolChance: 0.25
 --- !u!114 &1477241731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2429,7 +2500,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1951042403948672363, guid: e19a5a9d9bd37d94a8375b3386aa8279, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3705901525619876796, guid: e19a5a9d9bd37d94a8375b3386aa8279, type: 3}
@@ -2450,3 +2522,4 @@ SceneRoots:
   - {fileID: 2269662975113165484}
   - {fileID: 1129679210}
   - {fileID: 2091207722}
+  - {fileID: 706914322}

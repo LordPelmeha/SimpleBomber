@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PauseMenuController : MonoBehaviour
 {
-    public GameObject pausePanel; 
+    public GameObject pausePanel;
 
     private void Start()
     {
@@ -37,6 +37,7 @@ public class PauseMenuController : MonoBehaviour
 
     public void OnContinueClicked()
     {
+        AudioManager.Instance?.PlayButtonClick();
         var gm = GameManager.Instance;
         if (gm != null)
         {
@@ -49,6 +50,7 @@ public class PauseMenuController : MonoBehaviour
 
     public void OnRestartClicked()
     {
+        AudioManager.Instance?.PlayButtonClick();
         var gm = GameManager.Instance;
         if (gm != null)
         {
@@ -58,15 +60,17 @@ public class PauseMenuController : MonoBehaviour
 
     public void OnMainMenuClicked()
     {
+        AudioManager.Instance?.PlayButtonClick();
         var gm = GameManager.Instance;
         if (gm != null)
         {
-            gm.LoadMainMenu(); 
+            gm.LoadMainMenu();
         }
     }
 
     public void OnQuitClicked()
     {
+        AudioManager.Instance?.PlayButtonClick();
         var gm = GameManager.Instance;
         if (gm != null)
         {

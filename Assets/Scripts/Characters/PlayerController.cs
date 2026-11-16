@@ -92,6 +92,12 @@ public class PlayerController : MonoBehaviour
         if (targetCell.IsOccupiedByEnemy)
         {
             PlayerHealth health = GetComponent<PlayerHealth>();
+            // Щит поглощает удар и сбивает врага
+            if (health != null && health.TryAbsorbHit())
+            {
+                targetCell.enemy.Die();
+                return;
+            }
             if (health != null) health.Die();
             return;
         }
@@ -111,6 +117,7 @@ public class PlayerController : MonoBehaviour
         // Ограничитель, чтобы не бегал слишком быстро (например, максимум x3)
         speedMultiplier = Mathf.Clamp(speedMultiplier, 1f, 3f);
         Debug.Log("Скорость увеличена! Текущий множитель: " + speedMultiplier);
+        AudioManager.Instance?.PlaySpeedPickup();
     }
 
     private void PlaceBomb()
@@ -120,5 +127,6 @@ public class PlayerController : MonoBehaviour
         GameObject bombGo = Instantiate(bombPrefab, pos, Quaternion.identity);
         Bomb bomb = bombGo.GetComponent<Bomb>();
         if (bomb != null) bomb.Init(x, y, GameSettings.BombRange, bombFuseTime);
+        AudioManager.Instance?.PlayBombPlace();
     }
 }

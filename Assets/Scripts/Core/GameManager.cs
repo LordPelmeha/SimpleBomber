@@ -45,6 +45,9 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("GAME OVER");
 
+        AudioManager.Instance?.PlayPlayerDeath();
+        AudioManager.Instance?.PlayGameOverMusic();
+
         if (hud != null)
         {
             hud.ShowGameOver();
@@ -59,6 +62,8 @@ public class GameManager : MonoBehaviour
         IsGameOver = true;
 
         Debug.Log("YOU WIN!");
+
+        AudioManager.Instance?.PlayWin();
 
         if (hud != null)
         {
@@ -84,6 +89,7 @@ public class GameManager : MonoBehaviour
 
         IsPaused = true;
         Time.timeScale = 0f;
+        AudioManager.Instance?.SetPaused(true);
         Debug.Log("Game Paused");
     }
 
@@ -93,6 +99,7 @@ public class GameManager : MonoBehaviour
 
         IsPaused = false;
         Time.timeScale = 1f;
+        AudioManager.Instance?.SetPaused(false);
         Debug.Log("Game Resumed");
     }
 

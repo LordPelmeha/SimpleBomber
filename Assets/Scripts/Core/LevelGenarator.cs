@@ -24,6 +24,11 @@ public class LevelGenerator : MonoBehaviour
     public int maxPowerUps = 2;
     public int minDistanceFromPlayer = 3; // Чтобы бонус не появлялся прямо под ногами
 
+    [Header("Щиты на карте")]
+    public GameObject shieldPowerUpPrefab;
+    public int minShieldPowerUps = 0;
+    public int maxShieldPowerUps = 1;
+
     private GridManager grid;
 
     private void Start()
@@ -132,7 +137,7 @@ public class LevelGenerator : MonoBehaviour
     // 🆕 Метод для спавна бонусов
     private void SpawnPowerUps()
     {
-        if (speedPowerUpPrefab == null) return;
+        if (speedPowerUpPrefab == null && shieldPowerUpPrefab == null) return;
 
         // Координаты выхода
         int exitX = grid.width - 2;
@@ -174,9 +179,27 @@ public class LevelGenerator : MonoBehaviour
             Cell chosenCell = emptyCells[randomIndex];
 
             Vector3 pos = grid.GridToWorld(chosenCell.x, chosenCell.y);
-            Instantiate(speedPowerUpPrefab, pos, Quaternion.identity, transform);
+            if (speedPowerUpPrefab != null)
+                Instantiate(speedPowerUpPrefab, pos, Quaternion.identity, transform);
 
             emptyCells.RemoveAt(randomIndex);
+        }
+
+        // 3. Щиты (берём клетки, которые ещё свободны)
+        if (shieldPowerUpPrefab == null) return;
+
+        int shieldsToSpawn = Random.Range(minShieldPowerUps, maxShieldPowerUps + 1);
+        for (int i = 0; i < shieldsToSpawn; i++)
+        {
+            if (emptyCells.Count == 0) break;
+
+            int shieldIndex = Random.Range(0, emptyCells.Count);
+            Cell shieldCell = emptyCells[shieldIndex];
+
+            Vector3 shieldPos = grid.GridToWorld(shieldCell.x, shieldCell.y);
+            Instantiate(shieldPowerUpPrefab, shieldPos, Quaternion.identity, transform);
+
+            emptyCells.RemoveAt(shieldIndex);
         }
     }
 }

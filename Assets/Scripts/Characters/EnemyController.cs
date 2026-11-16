@@ -17,6 +17,9 @@ public class EnemyController : MonoBehaviour
     [Header("Движение")]
     public float moveSpeedCellsPerSecond = 2f;
 
+    [Tooltip("Радиус (в клетках), на котором враг замечает игрока. 0 — преследует всегда (как обычный и танк). Если игрок дальше — враг блуждает.")]
+    public int chaseRadius = 0;
+
     private int currentHits = 0;
     private float lastHitTime = -999f;
     private bool isDead = false;
@@ -69,7 +72,20 @@ public class EnemyController : MonoBehaviour
         if (px == x && py == y)
         {
             var health = player.GetComponent<PlayerHealth>();
+            // Щит поглощает удар и сбивает врага
+            if (health != null && health.TryAbsorbHit())
+            {
+                Die();
+                return;
+            }
             if (health != null) health.Die();
+            return;
+        }
+
+        // Патрульный режим: игрок вне радиуса обнаружения — враг просто блуждает
+        if (chaseRadius > 0 && Mathf.Max(Mathf.Abs(px - x), Mathf.Abs(py - y)) > chaseRadius)
+        {
+            Patrol();
             return;
         }
 
@@ -85,6 +101,28 @@ public class EnemyController : MonoBehaviour
                 Cell nextCell = path[1];
                 TryMoveTo(nextCell.x, nextCell.y);
             }
+        }
+    }
+
+    // Случайный шаг в одну из проходимых соседних клеток
+    private void Patrol()
+    {
+        int[,] dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        int start = Random.Range(0, 4);
+
+        for (int i = 0; i < 4; i++)
+        {
+            int d = (start + i) % 4;
+            int nx = x + dirs[d, 0];
+            int ny = y + dirs[d, 1];
+
+            if (!grid.IsWalkable(nx, ny)) continue;
+
+            Cell target = grid.GetCell(nx, ny);
+            if (target == null || target.IsOccupiedByEnemy) continue;
+
+            TryMoveTo(nx, ny);
+            return;
         }
     }
 
@@ -105,6 +143,12 @@ public class EnemyController : MonoBehaviour
             if (px == nx && py == ny)
             {
                 var health = player.GetComponent<PlayerHealth>();
+                // Щит поглощает удар и сбивает врага
+                if (health != null && health.TryAbsorbHit())
+                {
+                    Die();
+                    return;
+                }
                 if (health != null) health.Die();
                 return; // Враг не делает шаг, игрок умирает
             }
@@ -140,6 +184,7 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
+            AudioManager.Instance?.PlayEnemyHit();
             StartCoroutine(HitFlash());
         }
     }
@@ -176,6 +221,8 @@ public class EnemyController : MonoBehaviour
 
     public void Die()
     {
+        AudioManager.Instance?.PlayEnemyDeath();
+
         if (grid != null)
         {
             Cell c = grid.GetCell(x, y);

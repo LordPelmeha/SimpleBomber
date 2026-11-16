@@ -7,6 +7,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Префабы врагов")]
     public GameObject enemyPrefab;       // обычный враг
     public GameObject tankEnemyPrefab;   // танк (медленный, 2 хита)
+    public GameObject patrolEnemyPrefab; // патрульный (блуждает, пока игрок далеко)
 
     [Header("Спавн")]
     [Tooltip("Минимальное расстояние от игрока (в клетках) до точки появления врага")]
@@ -15,6 +16,10 @@ public class EnemySpawner : MonoBehaviour
     [Range(0f, 1f)]
     [Tooltip("Шанс, что появится танк вместо обычного врага")]
     public float tankChance = 0.2f;
+
+    [Range(0f, 1f)]
+    [Tooltip("Шанс появления патрульного врага. Сумма tankChance + patrolChance должна быть не больше 1")]
+    public float patrolChance = 0.25f;
 
     private GridManager grid;
     private GameManager gm;
@@ -101,8 +106,11 @@ public class EnemySpawner : MonoBehaviour
 
         // Выбор типа врага
         GameObject prefabToSpawn = enemyPrefab;
-        if (tankEnemyPrefab != null && Random.value < tankChance)
+        float roll = Random.value;
+        if (tankEnemyPrefab != null && roll < tankChance)
             prefabToSpawn = tankEnemyPrefab;
+        else if (patrolEnemyPrefab != null && roll < tankChance + patrolChance)
+            prefabToSpawn = patrolEnemyPrefab;
 
         Vector3 pos = grid.GridToWorld(spawnCell.x, spawnCell.y);
         GameObject enemyGo = Instantiate(prefabToSpawn, pos, Quaternion.identity);
