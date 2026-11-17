@@ -95,7 +95,7 @@ public class EnemyController : MonoBehaviour
 
         if (target.IsOccupiedByEnemy) return;
 
-        // 🆕 ПРОВЕРКА НА ИГРОКА: если шагаем в клетку игрока, наносим урон
+ 
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player != null)
         {
@@ -183,7 +183,6 @@ public class EnemyController : MonoBehaviour
                 c.enemy = null;
         }
 
-        // 🆕 Уведомляем GameManager, что враг убит
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnEnemyKilled();

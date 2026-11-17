@@ -17,9 +17,9 @@ public class LevelGenerator : MonoBehaviour
     [Tooltip("Радиус (в клетках) вокруг выхода, где враги не спавнятся")]
     public int exitSafeRadius = 2;
 
-    // 🆕 Блок для настройки бонусов
+  
     [Header("Бонусы на карте")]
-    public GameObject speedPowerUpPrefab; // Сюда перетащим префаб
+    public GameObject speedPowerUpPrefab; 
     public int minPowerUps = 1;
     public int maxPowerUps = 2;
     public int minDistanceFromPlayer = 3; // Чтобы бонус не появлялся прямо под ногами
@@ -34,7 +34,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void Generate()
     {
-        // === 1. Генерация пола и стен ===
+      
         for (int x = 0; x < grid.width; x++)
         {
             for (int y = 0; y < grid.height; y++)
@@ -84,7 +84,7 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        // === 2. Игрок и выход ===
+
         grid.Cells[1, 1].type = CellType.PlayerSpawn;
 
         int exitX = grid.width - 2;
@@ -96,7 +96,7 @@ public class LevelGenerator : MonoBehaviour
             Quaternion.identity,
             transform);
 
-        // === 3. Точки спавна врагов ===
+    
         for (int x = 1; x < grid.width - 1; x++)
         {
             for (int y = 1; y < grid.height - 1; y++)
@@ -123,22 +123,20 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        // === 4. 🆕 Спавн бонусов на карте ===
+    
         SpawnPowerUps();
     }
 
-    // 🆕 Новый метод для спавна бонусов
-    // 🆕 Новый метод для спавна бонусов
-    // 🆕 Метод для спавна бонусов
+   
     private void SpawnPowerUps()
     {
         if (speedPowerUpPrefab == null) return;
 
-        // Координаты выхода
+     
         int exitX = grid.width - 2;
         int exitY = grid.height - 2;
 
-        // 1. Собираем все пустые клетки (куда можно наступить)
+        //  пустые клетки 
         List<Cell> emptyCells = new List<Cell>();
 
         for (int x = 0; x < grid.width; x++)
@@ -147,14 +145,14 @@ public class LevelGenerator : MonoBehaviour
             {
                 Cell cell = grid.Cells[x, y];
 
-                // 🆕 РАЗРЕШАЕМ спавн как на обычном полу, так и на точках врагов
+      
                 if (cell != null && (cell.type == CellType.Empty || cell.type == CellType.EnemySpawn))
                 {
-                    // Проверяем расстояние до игрока
+                    // расстояние до игрока
                     int distToPlayer = Mathf.Max(Mathf.Abs(1 - x), Mathf.Abs(1 - y));
                     if (distToPlayer < minDistanceFromPlayer) continue;
 
-                    // Проверяем расстояние до выхода
+                    // расстояние до выхода
                     int distToExit = Mathf.Max(Mathf.Abs(exitX - x), Mathf.Abs(exitY - y));
                     if (distToExit < exitSafeRadius) continue;
 
@@ -163,12 +161,12 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        // 2. Определяем, сколько бонусов создадим
+  
         int powerUpsToSpawn = Random.Range(minPowerUps, maxPowerUps + 1);
 
         for (int i = 0; i < powerUpsToSpawn; i++)
         {
-            if (emptyCells.Count == 0) break; // Если места не осталось
+            if (emptyCells.Count == 0) break; 
 
             int randomIndex = Random.Range(0, emptyCells.Count);
             Cell chosenCell = emptyCells[randomIndex];

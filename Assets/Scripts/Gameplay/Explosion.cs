@@ -9,7 +9,7 @@ public class Explosion : MonoBehaviour
     private int gridY;
     private GridManager grid;
 
-    // Список врагов, которым ЭТОТ взрыв уже нанес урон
+    // Список врагов, которым взрыв уже нанес урон
     private HashSet<EnemyController> damagedEnemies = new HashSet<EnemyController>();
 
     public void Init(int x, int y)
@@ -60,14 +60,14 @@ public class Explosion : MonoBehaviour
         }
         else if (other.CompareTag("Enemy"))
         {
-            // Ищем скрипт врага (вдруг коллайдер на дочернем объекте)
+           
             var enemy = other.GetComponentInParent<EnemyController>();
 
-            // Если нашли и еще не били его ЭТИМ взрывом
+     
             if (enemy != null && !damagedEnemies.Contains(enemy))
             {
-                damagedEnemies.Add(enemy); // Запоминаем
-                enemy.Hit();               // Бьем
+                damagedEnemies.Add(enemy);
+                enemy.Hit();              
             }
         }
     }
